@@ -1,7 +1,6 @@
 import nltk
 import nltk.corpus
 
-words = nltk.corpus.words
 
 def valid_dict(dictionary):
     valid = []
@@ -15,14 +14,15 @@ def save_dict(lines, filename):
         for line in lines:
             f.write(f"{line}\n")
 
-def setup_procedure():
-    dict_en = words.raw("en")
+def setup_procedure(nltk_dict, filename):
+    words = nltk.corpus.words
+    dict_en = words.raw(nltk_dict)
     print("dictionary successfully loaded")
     list_en = dict_en.split()
     print(f"{len(list_en)} words in dictionary")
     valid_en = valid_dict(list_en)
     print(f"{len(valid_en)} valid words")
-    save_dict(valid_en,"valid_en.txt")
+    save_dict(valid_en,filename)
 
 def possibleWords(center, outer, dict_file):
     """
@@ -38,7 +38,7 @@ def possibleWords(center, outer, dict_file):
     """
     letters = set([*outer])
     letters.add(center)
-    print(f"Today's letters are {letters}")
+    print(f" \nToday's letters are {letters}\n")
     dictionary = open(dict_file, "r")
     words = dictionary.read().split()
     #print(len(words))
@@ -55,25 +55,29 @@ def possibleWords(center, outer, dict_file):
 
     return pangrams, result
 
-def to_text(p, r):
-    pangrams = sorted(p, key=len, reverse=True)
-    others = sorted(r, key=len, reverse=True)
+def to_text(p, o):
+    pangrams = list(set(p))
+    others = list(set(o))
+    pangrams = sorted(pangrams, key=len, reverse=True)
+    others = sorted(others, key=len, reverse=True)
+    
     text = "Today's Pangram(s):\n"
     for line in pangrams:
         text+=f"{line}\n"
-    text+= "Other possible words:\n"
+    text+= "\nOther possible words:\n"
     for line in others:
         text+=f"{line}\n"    
     count = len(pangrams)+len(others)
-    text += f"The maximun number of words today is {count}\n"
+    text += f"Spelling Bee Bot found {count} words.\n"
     print(text)
     
-# # YOU ONLY NEED TO RUN SETUP ONCE
-# setup_procedure()
 
-yellow_letter = "i"
-other_letters = "pzdtue"
+yellow_letter = input("What is the center letter? ").lower()
+other_letters = input("Enter the other letters in any order: ").lower()
 dictionary = "valid_en.txt"
+
+# # ONLY RUN SETUP IF YOU WANT TO CHANGE OR ADD A NEW DICTIONARY
+# setup_procedure("en", dictionary)
 
 p, o = possibleWords(yellow_letter, other_letters, dictionary)
 to_text(p,o)
